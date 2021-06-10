@@ -18,6 +18,7 @@ class DownloadOptions():
         self.playlist = args.playlist
         self.saveto = args.save_to
         self.orderby = args.order_by
+        self.keep_original_filename = args.original_filenames
         pass
 
 def list_playlists(baseurl: str, token: str):
@@ -82,7 +83,10 @@ def download_playlist(options: DownloadOptions):
     print('Downloading files...', end='')
     i = 1
     for item in items:
-        files = item.download(saveto)
+        files = item.download(saveto, keep_original_name=options.keep_original_filename)
+        if (options.keep_original_filename):
+            continue
+
         file = files[0]
         dir = os.path.dirname(file)
         _, ext = os.path.splitext(file)
@@ -124,6 +128,11 @@ def main():
         '--save-to',
         type = str,
         help = "Supply a directory where to save the downloaded files to"
+    )
+    parser.add_argument(
+        '--original-filenames',
+        action = 'store_true',
+        help = "Use this option to download the files using their original filename"
     )
     
     args = parser.parse_args()

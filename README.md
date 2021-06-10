@@ -74,6 +74,8 @@ with `--order-by <field>` (see below for more details).
 
 The following optional arguments can be supplied when combined with the `--playlist` argument:
 
+- `--original-filenames`: Use this switch to download the files using their original filenames. This will omit renaming the files.
+  Also note that it does not make sense to combine this argument with `--order-by <field>`.
 - `--save-to <path>`: Specify a path where you want your files to be saved. If the path does not exist it will be created.
 - `--order-by <field>`: Reorders your files from the playlist in the order given by the supplied field. A valid value
   would be for instance `originallyAvailableAt` which outputs photos in the order of the date they were taken. If you're
