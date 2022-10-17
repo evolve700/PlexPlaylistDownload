@@ -19,19 +19,29 @@ class DownloadOptions():
         self.saveto = args.save_to
         self.orderby = args.order_by
         self.keep_original_filename = args.original_filenames
+        self.user = args.switch_user
         pass
 
-def list_playlists(baseurl: str, token: str):
+def list_playlists(options: DownloadOptions):
     """ Lists all playlists on the given Plex server by library
     """
 
     print('Connecting to plex...', end='')
     try:
-        plex = PlexServer(baseurl, token)
+        plex = PlexServer(options.host, options.token)
     except (plexapi.exceptions.Unauthorized, requests.exceptions.ConnectionError):
         print(' failed')
         return
     print(' done')
+
+    if options.user != None:
+        print('Switching to managed account %s...' % options.user, end='')
+        try:
+            plex = plex.switchUser(options.user)
+        except (plexapi.exceptions.Unauthorized, requests.exceptions.ConnectionError):
+            print(' failed')
+            return
+        print(' done')
 
     print('Getting playlists... ', end='')
     playlists = plex.playlists()
@@ -70,6 +80,15 @@ def download_playlist(options: DownloadOptions):
         print(' failed')
         return
     print(' done')
+
+    if options.user != None:
+        print('Switching to managed account %s...' % options.user, end='')
+        try:
+            plex = plex.switchUser(options.user)
+        except (plexapi.exceptions.Unauthorized, requests.exceptions.ConnectionError):
+            print(' failed')
+            return
+        print(' done')
 
     saveto = './%s/' % (playlist.title if options.saveto == None else options.saveto)
     
@@ -117,7 +136,7 @@ def main():
         '--token',
         type = str,
         help = "The Token used to authenticate with the Plex Server",
-        default = 'xxiaNX8rigEPYadJRrv3'
+        default = 'qwAUDPoVCf4x1KJ9GJbJ'
     )
     parser.add_argument(
         '--order-by',
@@ -134,12 +153,18 @@ def main():
         action = 'store_true',
         help = "Use this option to download the files using their original filename"
     )
+    parser.add_argument(
+        '-u', '--switch-user',
+        type = str,
+        help = "Optional: The Managed User Account you want to switch to upon connect."
+    )
     
     args = parser.parse_args()
+    options = DownloadOptions(args=args)
+
     if (args.list):
-        list_playlists(args.host, args.token)
+        list_playlists(options)
     else:
-        options = DownloadOptions(args=args)
         download_playlist(options)
 
 if __name__ == "__main__":
