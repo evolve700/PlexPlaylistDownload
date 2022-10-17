@@ -73,14 +73,6 @@ def download_playlist(options: DownloadOptions):
         return
     print(' done')
 
-    print('Getting playlist...', end='')
-    try:
-        playlist = plex.playlist(options.playlist)
-    except (plexapi.exceptions.NotFound):
-        print(' failed')
-        return
-    print(' done')
-
     if options.user != None:
         print('Switching to managed account %s...' % options.user, end='')
         try:
@@ -89,6 +81,14 @@ def download_playlist(options: DownloadOptions):
             print(' failed')
             return
         print(' done')
+
+    print('Getting playlist...', end='')
+    try:
+        playlist = plex.playlist(options.playlist)
+    except (plexapi.exceptions.NotFound):
+        print(' failed')
+        return
+    print(' done')
 
     saveto = './%s/' % (playlist.title if options.saveto == None else options.saveto)
     
